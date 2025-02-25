@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <tuple>
 #include <vector>
 #include "ps1.hpp"
 
@@ -28,4 +29,26 @@ TEST(Ps1Tests, MergeTest) {
   ASSERT_EQ(merge({}, {}), std::vector<int>{}) << "merge 2 empty lists";
   ASSERT_EQ(merge({1}, {}), std::vector<int>{1})
       << "merge a single list with an empty list";
+}
+
+TEST(Ps1Tests, UnzipTest) {
+  ASSERT_EQ(unzip(std::vector<std::tuple<bool, bool>>(
+                {{true, false}, {false, false}, {false, true}})),
+            std::make_tuple(std::vector<bool>{true, false, false},
+                            std::vector<bool>{false, false, true}))
+      << "unzip a simple list";
+  ASSERT_EQ(unzip(std::vector<std::tuple<bool, bool>>()),
+            std::make_tuple(std::vector<bool>(), std::vector<bool>()))
+      << "unzip an empty list";
+}
+
+TEST(Ps1Tests, RunLengthTest) {
+  std::vector<char> from{'a', 'a', 'a', 'a', 'a', 'b', 'b',
+                         'b', 'a', 'd', 'd', 'd', 'd'};
+  std::vector<std::tuple<int, char>> to{{5, 'a'}, {3, 'b'}, {1, 'a'}, {4, 'd'}};
+
+  ASSERT_EQ(to_run_length(from), to) << "to_run_length";
+  ASSERT_EQ(from_run_length(to), from) << "from_run_length";
+  ASSERT_EQ(from_run_length(to_run_length(from)), from)
+      << "to_run_length -> from_run_length";
 }
