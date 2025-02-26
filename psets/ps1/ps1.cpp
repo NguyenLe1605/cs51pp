@@ -1,7 +1,6 @@
 #include "ps1.hpp"
 #include <algorithm>
 #include <deque>
-#include <iostream>
 #include <tuple>
 #include "matchit.h"
 
@@ -171,4 +170,28 @@ auto from_run_length_rev(Subrange<Iterator> const &range) -> std::vector<char> {
 auto from_run_length(const std::vector<std::tuple<int, char>> &list)
     -> std::vector<char> {
   return from_run_length_rev(Subrange(list.rbegin(), list.rend()));
+}
+
+template <class Iterator, typename T = Iterator::value_type>
+auto extract_entry_range(play_t play, const Subrange<Iterator> &range)
+    -> std::pair<int, int> {
+  Id<T> head;
+  Id<Subrange<Iterator>> tail;
+  return match(range)(
+      pattern | ds() = [&] { return std::make_pair(404, 404); },
+      pattern | ds(head, tail.at(ooo)) =
+          [&] {
+            play_t p;
+            std::pair<int, int> result;
+            std::tie(p, result) = head.value();
+            if (p == play) {
+              return result;
+            }
+            return extract_entry_range(play, *tail);
+          });
+}
+
+auto extract_entry(play_t play, const payoff_matrix_t &matrix)
+    -> std::pair<int, int> {
+  return extract_entry_range(play, Subrange(matrix.begin(), matrix.end()));
 }
